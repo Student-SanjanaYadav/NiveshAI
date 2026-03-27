@@ -25,7 +25,7 @@ export default function Radar() {
 
     Promise.all(
       selected.map((s) =>
-        fetch("http://127.0.0.1:5000/stock/" + s)
+        fetch("https://niveshai-4.onrender.com/stock/" + s)
           .then((res) => res.json())
       )
     ).then((results) => {

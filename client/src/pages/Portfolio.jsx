@@ -18,7 +18,7 @@ export default function Portfolio() {
     if (!stock || !amount) return;
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/stock/" + stock);
+      const res = await fetch("https://niveshai-4.onrender.com/stock/" + stock);
       const data = await res.json();
 
       const latestPrice = data.prices?.slice(-1)[0] || 0;
