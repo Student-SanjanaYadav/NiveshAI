@@ -3,6 +3,7 @@ import { useState } from "react";
 export default function Portfolio() {
   const [stock, setStock] = useState("RELIANCE.NS");
   const [quantity, setQuantity] = useState(1);
+  const [buyPrice, setBuyPrice] = useState("");
   const [portfolio, setPortfolio] = useState([]);
 
   const stockList = [
@@ -11,41 +12,60 @@ export default function Portfolio() {
   ];
 
   const addStock = async () => {
+    if (!buyPrice) {
+      alert("Enter Buy Price");
+      return;
+    }
+
     try {
       const res = await fetch(`https://niveshai-4.onrender.com/stock/${stock}`);
       const data = await res.json();
 
-      const latestPrice = data.prices[data.prices.length - 1];
+      const currentPrice = data.prices?.slice(-1)[0] || 0;
 
       const newStock = {
         name: stock,
-        quantity: quantity,
-        price: latestPrice,
-        total: latestPrice * quantity,
+        quantity: Number(quantity),
+        buyPrice: Number(buyPrice),
+        currentPrice,
       };
 
       setPortfolio([...portfolio, newStock]);
-    } catch (err) {
-      console.log(err);
-      alert("API not working ❌");
+      setBuyPrice("");
+    } catch {
+      alert("API Error ❌");
     }
   };
 
-  // 🔥 TOTAL PORTFOLIO VALUE
-  const totalValue = portfolio.reduce((acc, item) => acc + item.total, 0);
+  // 🔥 CALCULATIONS
+  const totalInvestment = portfolio.reduce(
+    (acc, item) => acc + item.buyPrice * item.quantity,
+    0
+  );
+
+  const currentValue = portfolio.reduce(
+    (acc, item) => acc + item.currentPrice * item.quantity,
+    0
+  );
+
+  const profitLoss = currentValue - totalInvestment;
+  const profitPercent =
+    totalInvestment > 0 ? (profitLoss / totalInvestment) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-black text-white p-6">
+    <div className="min-h-screen bg-black text-white p-4 sm:p-6">
 
-      <h1 className="text-3xl font-bold mb-6">Portfolio</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">
+        Portfolio 💰
+      </h1>
 
       {/* INPUTS */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
 
         <select
           value={stock}
           onChange={(e) => setStock(e.target.value)}
-          className="px-4 py-2 bg-gray-800 rounded"
+          className="px-3 py-2 bg-gray-800 rounded"
         >
           {stockList.map((s, i) => (
             <option key={i}>{s}</option>
@@ -54,10 +74,18 @@ export default function Portfolio() {
 
         <input
           type="number"
+          placeholder="Qty"
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
-          className="px-4 py-2 bg-gray-800 rounded"
-          placeholder="Quantity"
+          className="px-3 py-2 bg-gray-800 rounded"
+        />
+
+        <input
+          type="number"
+          placeholder="Buy Price"
+          value={buyPrice}
+          onChange={(e) => setBuyPrice(e.target.value)}
+          className="px-3 py-2 bg-gray-800 rounded"
         />
 
         <button
@@ -68,23 +96,52 @@ export default function Portfolio() {
         </button>
       </div>
 
-      {/* LIST */}
+      {/* STOCK LIST */}
       <div className="space-y-3">
-        {portfolio.map((item, i) => (
-          <div key={i} className="bg-gray-900 p-4 rounded flex justify-between">
-            <span>{item.name}</span>
-            <span>Qty: {item.quantity}</span>
-            <span>₹{item.price}</span>
-            <span className="text-green-400">₹{item.total}</span>
-          </div>
-        ))}
+        {portfolio.map((item, i) => {
+          const invested = item.buyPrice * item.quantity;
+          const current = item.currentPrice * item.quantity;
+          const pnl = current - invested;
+
+          return (
+            <div key={i} className="bg-gray-900 p-4 rounded-xl">
+              <div className="flex justify-between text-sm">
+                <span>{item.name}</span>
+                <span>Qty: {item.quantity}</span>
+              </div>
+
+              <div className="flex justify-between mt-2 text-sm">
+                <span>Buy: ₹{item.buyPrice}</span>
+                <span>Current: ₹{item.currentPrice}</span>
+              </div>
+
+              <div
+                className={`mt-2 font-bold ${
+                  pnl >= 0 ? "text-green-400" : "text-red-400"
+                }`}
+              >
+                P&L: ₹{pnl.toFixed(2)}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* TOTAL */}
-      <div className="mt-6 text-xl font-bold">
-        Total Value: ₹{totalValue.toFixed(2)}
-      </div>
+      {/* SUMMARY */}
+      <div className="mt-6 p-4 bg-gray-900 rounded-xl">
 
+        <p>Total Investment: ₹{totalInvestment.toFixed(2)}</p>
+        <p>Current Value: ₹{currentValue.toFixed(2)}</p>
+
+        <p
+          className={`font-bold ${
+            profitLoss >= 0 ? "text-green-400" : "text-red-400"
+          }`}
+        >
+          Overall P&L: ₹{profitLoss.toFixed(2)} ({profitPercent.toFixed(2)}%)
+        </p>
+
+      </div>
     </div>
   );
 }
