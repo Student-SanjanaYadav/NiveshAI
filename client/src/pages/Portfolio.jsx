@@ -1,137 +1,90 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Portfolio() {
+  const [stock, setStock] = useState("RELIANCE.NS");
+  const [quantity, setQuantity] = useState(1);
   const [portfolio, setPortfolio] = useState([]);
-  const [stock, setStock] = useState("");
-  const [amount, setAmount] = useState("");
 
   const stockList = [
     "RELIANCE.NS","TCS.NS","INFY.NS","HDFCBANK.NS","ICICIBANK.NS",
-    "SBIN.NS","LT.NS","ITC.NS","WIPRO.NS","AXISBANK.NS",
-    "MARUTI.NS","TATAMOTORS.NS","ADANIENT.NS","ADANIPORTS.NS",
-    "BAJFINANCE.NS","HCLTECH.NS","SUNPHARMA.NS","TITAN.NS",
-    "ULTRACEMCO.NS","NESTLEIND.NS"
+    "SBIN.NS","ITC.NS","WIPRO.NS","AXISBANK.NS","TATAMOTORS.NS"
   ];
 
-  // 🔥 ADD STOCK
   const addStock = async () => {
-    if (!stock || !amount) return;
-
     try {
-      // ✅ FIXED API URL
-      const res = await fetch(`https://niveshai-gryl.onrender.com/stock/${stock}`);
+      const res = await fetch(`https://niveshai-4.onrender.com/stock/${stock}`);
       const data = await res.json();
 
-      const latestPrice = data.prices?.slice(-1)[0] || 0;
+      const latestPrice = data.prices[data.prices.length - 1];
 
-      const newItem = {
+      const newStock = {
         name: stock,
+        quantity: quantity,
         price: latestPrice,
-        decision: data.decision,
-        amount: Number(amount),
-        value: latestPrice * Number(amount),
+        total: latestPrice * quantity,
       };
 
-      setPortfolio([...portfolio, newItem]);
-      setStock("");
-      setAmount("");
+      setPortfolio([...portfolio, newStock]);
     } catch (err) {
-      console.log("Error fetching data");
+      console.log(err);
+      alert("API not working ❌");
     }
   };
 
-  // ❌ REMOVE
-  const removeStock = (name) => {
-    setPortfolio(portfolio.filter((item) => item.name !== name));
-  };
-
-  // 💰 TOTAL PORTFOLIO VALUE
-  const totalValue = portfolio.reduce((sum, item) => sum + item.value, 0);
+  // 🔥 TOTAL PORTFOLIO VALUE
+  const totalValue = portfolio.reduce((acc, item) => acc + item.total, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen bg-black text-white p-6">
 
-      <h1 className="text-2xl sm:text-3xl font-bold mb-6">💼 Portfolio</h1>
+      <h1 className="text-3xl font-bold mb-6">Portfolio</h1>
 
-      {/* ADD SECTION */}
+      {/* INPUTS */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
 
         <select
           value={stock}
           onChange={(e) => setStock(e.target.value)}
-          className="px-4 py-2 rounded bg-white/10 w-full sm:w-auto"
+          className="px-4 py-2 bg-gray-800 rounded"
         >
-          <option value="">Select Stock</option>
           {stockList.map((s, i) => (
-            <option key={i} value={s} className="bg-black">
-              {s}
-            </option>
+            <option key={i}>{s}</option>
           ))}
         </select>
 
         <input
           type="number"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+          className="px-4 py-2 bg-gray-800 rounded"
           placeholder="Quantity"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="px-4 py-2 rounded bg-white/10 w-full sm:w-auto"
         />
 
         <button
           onClick={addStock}
-          className="bg-green-500 px-4 py-2 rounded w-full sm:w-auto"
+          className="px-4 py-2 bg-green-500 rounded"
         >
           Add
         </button>
       </div>
 
-      {/* TOTAL VALUE */}
-      <div className="mb-6 text-lg sm:text-xl">
-        Total Value: <span className="text-green-400">₹ {totalValue.toFixed(2)}</span>
-      </div>
-
-      {/* PORTFOLIO GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
+      {/* LIST */}
+      <div className="space-y-3">
         {portfolio.map((item, i) => (
-          <div
-            key={i}
-            className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-lg"
-          >
-            <h2 className="text-lg font-bold break-words">{item.name}</h2>
-
-            <p className="text-gray-400 text-sm mt-1">
-              Price: ₹ {item.price}
-            </p>
-
-            <p className="text-gray-400 text-sm">
-              Quantity: {item.amount}
-            </p>
-
-            <p className="text-green-400 text-lg mt-2">
-              Value: ₹ {item.value.toFixed(2)}
-            </p>
-
-            <p
-              className={`mt-2 font-bold ${
-                item.decision === "BUY"
-                  ? "text-green-400"
-                  : "text-red-400"
-              }`}
-            >
-              {item.decision}
-            </p>
-
-            <button
-              onClick={() => removeStock(item.name)}
-              className="mt-3 text-red-400 text-sm"
-            >
-              Remove
-            </button>
+          <div key={i} className="bg-gray-900 p-4 rounded flex justify-between">
+            <span>{item.name}</span>
+            <span>Qty: {item.quantity}</span>
+            <span>₹{item.price}</span>
+            <span className="text-green-400">₹{item.total}</span>
           </div>
         ))}
-
       </div>
+
+      {/* TOTAL */}
+      <div className="mt-6 text-xl font-bold">
+        Total Value: ₹{totalValue.toFixed(2)}
+      </div>
+
     </div>
   );
 }
