@@ -9,6 +9,11 @@ print("SERVER STARTING...")
 app = Flask(__name__)
 CORS(app)
 
+@app.route('/')
+def home():
+    return "NiveshAI Backend is Running 🚀"
+
+
 @app.route("/stock/<symbol>")
 def get_stock(symbol):
     stock = yf.Ticker(symbol)
