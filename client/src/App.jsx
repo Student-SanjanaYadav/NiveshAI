@@ -7,12 +7,21 @@ import Portfolio from "./pages/Portfolio";
 import Radar from "./pages/Radar";
 import Login from "./pages/Login";
 import Sidebar from "./components/Sidebar";
+import MobileNavbar from "./components/MobileNavbar"; // ✅ NEW
 
 export default function App() {
   return (
     <BrowserRouter>
+
+      {/* ✅ MOBILE NAVBAR */}
+      <MobileNavbar />
+
       <div className="flex">
-        <Sidebar />
+
+        {/* ✅ Sidebar hidden on mobile */}
+        <div className="hidden md:block">
+          <Sidebar />
+        </div>
 
         <div className="flex-1">
           <motion.div

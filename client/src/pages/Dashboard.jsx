@@ -15,47 +15,39 @@ export default function Dashboard() {
   const [decision, setDecision] = useState("Loading...");
   const [loading, setLoading] = useState(false);
 
-  // 🔥 STOCK LIST (NEW ADDITION)
   const stockList = [
-    "RELIANCE.NS",
-    "TCS.NS",
-    "INFY.NS",
-    "HDFCBANK.NS",
-    "ICICIBANK.NS",
-    "SBIN.NS",
-    "LT.NS",
-    "ITC.NS",
-    "WIPRO.NS",
-    "AXISBANK.NS",
-    "MARUTI.NS",
-    "TATAMOTORS.NS",
-    "ADANIENT.NS",
-    "ADANIPORTS.NS",
-    "BAJFINANCE.NS",
-    "HCLTECH.NS",
-    "SUNPHARMA.NS",
-    "TITAN.NS",
-    "ULTRACEMCO.NS",
-    "NESTLEIND.NS"
+    "RELIANCE.NS","TCS.NS","INFY.NS","HDFCBANK.NS","ICICIBANK.NS",
+    "SBIN.NS","LT.NS","ITC.NS","WIPRO.NS","AXISBANK.NS",
+    "MARUTI.NS","TATAMOTORS.NS","ADANIENT.NS","ADANIPORTS.NS",
+    "BAJFINANCE.NS","HCLTECH.NS","SUNPHARMA.NS","TITAN.NS",
+    "ULTRACEMCO.NS","NESTLEIND.NS"
   ];
 
-  useEffect(() => {
-    if (!stock) return;
+useEffect(() => {
+  if (!stock) return;
 
-    setLoading(true);
+  setLoading(true);
 
-    fetch("https://niveshai-4.onrender.com/stock/" + stock)
-      .then((res) => res.json())
-      .then((data) => {
-        setPrices(data.prices || []);
-        setDecision(data.decision || "No Data");
+  fetch(`https://niveshai-4.onrender.com/stock/${stock}`)
+    .then((res) => {
+      if (!res.ok) throw new Error("API failed");
+      return res.json();
+    })
+    .then((data) => {
+      setPrices(data.prices);
+      setDecision(data.decision);
+      setLoading(false);
+    })
+    .catch((err) => {
+      console.log("API ERROR:", err);
 
-        setTimeout(() => setLoading(false), 1200);
-      })
-      .catch(() => setLoading(false));
-  }, [stock]);
+      // ❗ Instead of fake logic, show message
+      setPrices([]);
+      setDecision("API ERROR");
+      setLoading(false);
+    });
+}, [stock]);
 
-  // 🔥 LOADER
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black text-white">
@@ -73,19 +65,17 @@ export default function Dashboard() {
   }));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-4 sm:p-6 md:p-8">
 
-      {/* HEADER */}
-      <div className="mb-8 border-b border-white/10 pb-4">
-        <h1 className="text-4xl font-bold">Dashboard</h1>
+      <div className="mb-6 border-b border-white/10 pb-4">
+        <h1 className="text-2xl sm:text-4xl font-bold">Dashboard</h1>
         <p className="text-gray-400 text-sm">Live AI Stock Insights</p>
       </div>
 
-      {/* 🔥 DROPDOWN */}
       <select
         value={stock}
         onChange={(e) => setStock(e.target.value)}
-        className="mb-8 px-4 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/10"
+        className="mb-6 px-4 py-2 rounded-xl bg-white/10 border border-white/10 w-full sm:w-auto"
       >
         {stockList.map((s, i) => (
           <option key={i} value={s} className="bg-black">
@@ -94,47 +84,38 @@ export default function Dashboard() {
         ))}
       </select>
 
-      {/* GRID */}
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
         {/* CHART */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl hover:shadow-green-500/20 transition"
-        >
+        <motion.div className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-2xl shadow-xl">
           <h2 className="mb-4 text-gray-300">Market Trend</h2>
 
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={chartData}>
-              <XAxis dataKey="name" stroke="#888" />
-              <YAxis stroke="#888" />
-              <Tooltip />
-              <Line
-                type="monotone"
-                dataKey="price"
-                stroke="#00f5c4"
-                strokeWidth={3}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="w-full h-[250px] sm:h-[300px] md:h-[350px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData}>
+                <XAxis dataKey="name" stroke="#888" />
+                <YAxis stroke="#888" />
+                <Tooltip />
+                <Line
+                  type="monotone"
+                  dataKey="price"
+                  stroke="#00f5c4"
+                  strokeWidth={3}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
 
         {/* AI DECISION */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl hover:shadow-green-500/20 transition"
-        >
+        <motion.div className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-2xl shadow-xl">
           <h2 className="text-gray-300">AI Decision</h2>
 
-          <p
-            className={`text-3xl mt-4 font-bold ${
-              decision === "BUY"
-                ? "text-green-400"
-                : decision === "SELL"
-                ? "text-red-400"
-                : "text-yellow-400"
-            }`}
-          >
+          <p className={`text-2xl sm:text-3xl mt-4 font-bold ${
+            decision === "BUY" ? "text-green-400" :
+            decision === "SELL" ? "text-red-400" :
+            "text-yellow-400"
+          }`}>
             {decision}
           </p>
 
@@ -144,10 +125,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* RISK */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl hover:shadow-green-500/20 transition"
-        >
+        <motion.div className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-2xl shadow-xl">
           <h2 className="text-gray-300">Risk</h2>
 
           <div className="mt-4 h-3 bg-gray-700 rounded-full">
@@ -158,10 +136,7 @@ export default function Dashboard() {
         </motion.div>
 
         {/* WHY NOT */}
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-2xl shadow-xl hover:shadow-green-500/20 transition"
-        >
+        <motion.div className="bg-white/5 border border-white/10 p-4 sm:p-6 rounded-2xl shadow-xl">
           <h2 className="text-gray-300">Why NOT?</h2>
 
           <p className="mt-2 text-gray-400 text-sm">
