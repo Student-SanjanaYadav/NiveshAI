@@ -27,7 +27,7 @@ def get_stock(symbol):
         "decision": decision
     })
 
-    import os
+import os
 
 if __name__ == "__main__":
     print("SERVER STARTING...")
