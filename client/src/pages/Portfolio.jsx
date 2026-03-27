@@ -18,7 +18,8 @@ export default function Portfolio() {
     if (!stock || !amount) return;
 
     try {
-      const res = await fetch("https://niveshai-4.onrender.com/stock/" + stock);
+      // ✅ FIXED API URL
+      const res = await fetch(`https://niveshai-gryl.onrender.com/stock/${stock}`);
       const data = await res.json();
 
       const latestPrice = data.prices?.slice(-1)[0] || 0;
@@ -48,17 +49,17 @@ export default function Portfolio() {
   const totalValue = portfolio.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-8">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white p-4 sm:p-6 md:p-8">
 
-      <h1 className="text-3xl font-bold mb-6">💼 Portfolio</h1>
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6">💼 Portfolio</h1>
 
       {/* ADD SECTION */}
-      <div className="flex gap-4 mb-6 flex-wrap">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
 
         <select
           value={stock}
           onChange={(e) => setStock(e.target.value)}
-          className="px-4 py-2 rounded bg-white/10"
+          className="px-4 py-2 rounded bg-white/10 w-full sm:w-auto"
         >
           <option value="">Select Stock</option>
           {stockList.map((s, i) => (
@@ -73,31 +74,31 @@ export default function Portfolio() {
           placeholder="Quantity"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="px-4 py-2 rounded bg-white/10"
+          className="px-4 py-2 rounded bg-white/10 w-full sm:w-auto"
         />
 
         <button
           onClick={addStock}
-          className="bg-green-500 px-4 py-2 rounded"
+          className="bg-green-500 px-4 py-2 rounded w-full sm:w-auto"
         >
           Add
         </button>
       </div>
 
       {/* TOTAL VALUE */}
-      <div className="mb-6 text-xl">
+      <div className="mb-6 text-lg sm:text-xl">
         Total Value: <span className="text-green-400">₹ {totalValue.toFixed(2)}</span>
       </div>
 
       {/* PORTFOLIO GRID */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 
         {portfolio.map((item, i) => (
           <div
             key={i}
             className="bg-white/5 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-lg"
           >
-            <h2 className="text-lg font-bold">{item.name}</h2>
+            <h2 className="text-lg font-bold break-words">{item.name}</h2>
 
             <p className="text-gray-400 text-sm mt-1">
               Price: ₹ {item.price}
