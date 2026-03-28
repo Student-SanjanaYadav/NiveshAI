@@ -37,7 +37,7 @@ export default function Dashboard() {
 
     setLoading(true);
 
-    fetch(`http://127.0.0.1:5000/stock/${stock}`)
+    fetch(`https://niveshai-4.onrender.com/stock/${stock}`)
       .then((res) => res.json())
       .then((data) => {
         setPrices(data.prices || []);
