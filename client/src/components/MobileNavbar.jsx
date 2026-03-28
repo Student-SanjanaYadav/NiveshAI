@@ -7,7 +7,7 @@ export default function MobileNavbar() {
   return (
     <div className="md:hidden bg-black text-white p-4 flex justify-between items-center border-b border-white/10">
 
-      <h1 className="font-bold text-lg">NiveshAI 🚀</h1>
+      <h1 className="font-bold text-lg">NiveshAI </h1>
 
       <button onClick={() => setOpen(!open)}>
         ☰

@@ -45,7 +45,7 @@ export default function Home() {
           onClick={() => navigate("/dashboard")}
           className="mt-10 px-8 py-4 rounded-xl bg-gradient-to-r from-green-400 to-blue-500 text-black font-semibold text-lg hover:scale-105 transition"
         >
-          Get Started 🚀
+          Get Started 
         </motion.button>
       </div>
 
