@@ -4,7 +4,7 @@ export default function Sidebar() {
   return (
     <div className="hidden md:block w-64 h-screen bg-black/80 backdrop-blur-xl text-white p-6 border-r border-white/10">
       
-      <h1 className="text-2xl font-bold mb-10">NiveshAI 🚀</h1>
+      <h1 className="text-2xl font-bold mb-10">NiveshAI </h1>
 
       <nav className="flex flex-col gap-6 text-gray-300">
         <Link to="/" className="hover:text-white transition">Home</Link>
