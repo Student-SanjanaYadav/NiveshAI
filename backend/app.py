@@ -9,12 +9,12 @@ import pandas as pd
 app = Flask(__name__)
 CORS(app)
 
-# ✅ DATABASE CONFIG (NEW)
+# ✅ DATABASE CONFIG
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# 👤 USER MODEL (NEW)
+# 👤 USER MODEL
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=False)
@@ -28,7 +28,7 @@ with app.app_context():
 def home():
     return "NiveshAI Backend is Running 🚀"
 
-# ================= 🔐 AUTH ROUTES (NEW) =================
+# ================= 🔐 AUTH ROUTES =================
 
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -70,18 +70,19 @@ def login():
     except Exception as e:
         return jsonify({"error": str(e)})
 
-# ================= 📊 YOUR STOCK API (UNCHANGED) =================
+# ================= 📊 STOCK API (FIXED) =================
 
 @app.route("/stock/<symbol>")
 def get_stock(symbol):
     try:
-        data = yf.download(symbol, period="1mo", interval="1d")
+        # ✅ FIXED DATA FETCH (IMPORTANT CHANGE)
+        stock = yf.Ticker(symbol)
+        hist = stock.history(period="1mo")
 
-        if data.empty:
+        if hist is None or hist.empty:
             return jsonify({"error": "No data found"})
 
-        # ✅ FIXED PRICE EXTRACTION
-        close = data["Close"]
+        close = hist["Close"]
 
         if isinstance(close, pd.DataFrame):
             close = close.iloc[:, 0]
