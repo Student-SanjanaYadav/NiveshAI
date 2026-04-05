@@ -75,7 +75,8 @@ NEWS_API_KEY = "38facb2ab7a145cabf4581f1d54aa874"
 
 def get_stock_news(symbol):
     try:
-        url = f"https://newsapi.org/v2/everything?q={symbol}&apiKey={NEWS_API_KEY}&pageSize=3"
+        clean_symbol = symbol.replace(".NS", "")
+        url = f"https://newsapi.org/v2/everything?q={clean_symbol}&apiKey={NEWS_API_KEY}&pageSize=3"
         response = requests.get(url)
         data = response.json()
 
